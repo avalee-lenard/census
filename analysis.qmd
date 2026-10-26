@@ -1,0 +1,45 @@
+---
+title: "Analyzing US Census Data"
+Author: "Avalee Lenard"
+format: html
+execute:
+  echo: false
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+library(tidycensus)
+library(sf)
+```
+
+```{r}
+#| message: false
+#| cache: true
+income_tx <- get_acs(
+  geography = "county",
+  variables = "B19013_001",
+  state = "TX",
+  year = 2020,
+  geometry = TRUE
+)
+```
+
+```{r}
+ggplot(income_tx) +
+  geom_sf(aes(fill = estimate), color = NA) +
+  scale_fill_viridis_c(
+    labels = scales::label_dollar(),
+    name = "Median household\nincome"
+  ) +
+  labs(
+    title = "Median Household Income by Texas County",
+    caption = "Source: U.S. Census Bureau, 2016–2020 American Community Survey 5-Year Estimates."
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(face = "bold"),
+    plot.caption = element_text(hjust = 0),
+    legend.position = "right"
+  )
+```
