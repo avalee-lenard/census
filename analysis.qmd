@@ -43,3 +43,48 @@ ggplot(income_tx) +
     legend.position = "right"
   )
 ```
+
+```{r}
+#| message: false
+edu_state <- get_acs(
+  geography = "state",
+  variables = c(
+    "B15003_001",
+    "B15003_022",
+    "B15003_023",
+    "B15003_024",
+    "B15003_025"
+  ),
+  summary_var = "B15003_001",
+  year = 2020
+)
+```
+
+```{r}
+#| fig-height: 12
+edu_state |>
+  filter(variable %in% c("B15003_022", "B15003_023", "B15003_024", "B15003_025")) |>
+  group_by(GEOID, NAME) |>
+  summarize(
+    percent_bachelors = sum(estimate, na.rm = TRUE) / first(summary_est) * 100,
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = reorder(NAME, percent_bachelors), y = percent_bachelors)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  scale_y_continuous(labels = scales::label_percent(scale = 1)) +
+  labs(
+    title = "Adults with a Bachelor's Degree or Higher",
+    subtitle = "Percentage by state-level geography",
+    x = NULL,
+    y = "Adults with a bachelor's degree or higher",
+    caption = "Source: U.S. Census Bureau, 2016–2020 American Community Survey 5-Year Estimates."
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold"),
+    plot.caption = element_text(hjust = 0),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+```
